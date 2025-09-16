@@ -1,0 +1,39 @@
+{
+  "name": "rolldown-browser-demo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:watch": "vite build --watch",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@rolldown/plugin-node-polyfills": "^1.0.0",
+    "pathe": "^2.0.3",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "vite": "npm:rolldown-vite@latest"
+  },
+  "dependencies": {
+    "@rolldown/browser": "latest",
+    "@rollup/plugin-alias": "^5.1.1",
+    "@smessie/readable-web-to-node-stream": "^3.0.3",
+    "axios": "1.12.2",
+    "eventemitter3": "^5.0.1",
+    "gunzip-maybe": "^1.4.2",
+    "js-untar": "^2.0.0",
+    "memfs": "4.39.0",
+    "memfs-browser": "^3.5.10302",
+    "stream": "0.0.3",
+    "tar-fs": "^3.1.0",
+    "tar-stream": "^3.1.7",
+    "web-streams-polyfill": "^4.2.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "rolldown": "1.0.0-beta.38",
+      "b4a": "1.6.7"
+    }
+  }
+}
