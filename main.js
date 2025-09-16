@@ -2,76 +2,110 @@ import './style.css'
 import { Bundler } from './bundle.js'
 import { MemfsWithPackageInstaller } from './memfs.js'
 
-const memfs = new MemfsWithPackageInstaller()
+class RolldownDemo {
+  constructor() {
+    this.memfs = new MemfsWithPackageInstaller()
+    this.initializeElements()
+    this.setupEventListeners()
+    this.setDefaultCode()
+  }
 
+  initializeElements() {
+    this.inputElement = document.querySelector('#input')
+    this.bundleButton = document.querySelector('#bundle')
+    this.installButton = document.querySelector('#install')
+    this.outputElement = document.querySelector('#output')
+  }
 
-const inputElement = document.querySelector('#input')
-const bundleButton = document.querySelector('#bundle')
-const installButton = document.querySelector('#install')
-const outputElement = document.querySelector('#output')
-
-// Default example code
-inputElement.value = `export function greet(name) {
+  setDefaultCode() {
+    this.inputElement.value = `export function greet(name) {
   return \`Hello, \${name}!\`
 }
 
 console.log(greet('Rolldown'))`
+  }
 
-bundleButton.addEventListener('click', async () => {
-  try {
-    bundleButton.disabled = true
-    bundleButton.textContent = 'Bundling...'
-    outputElement.innerHTML = '<p>Processing...</p>'
-    memfs.writeFile('/main.js', inputElement.value)
-    console.log(`memfs.getFile('/main.js'): `, memfs.getFile('/main.js'))
-    let bundler = new Bundler(memfs)
-    const output = await bundler.build(); 
+  setupEventListeners() {
+    this.bundleButton.addEventListener('click', () => this.handleBundle())
+    this.installButton.addEventListener('click', () => this.handleInstall())
+  }
 
+  async handleBundle() {
+    try {
+      this.setBundleButtonState(true, 'Bundling...')
+      this.setOutput('<p>Processing...</p>')
 
-    const bundledCode = output[0].code
+      this.memfs.writeFile('/main.js', this.inputElement.value)
+      const bundler = new Bundler(this.memfs)
+      const output = await bundler.build()
 
-    outputElement.innerHTML = `
+      const bundledCode = output[0].code
+      this.displayBundleSuccess(bundledCode)
+
+    } catch (error) {
+      console.error('Bundle error:', error)
+      this.displayError('Error:', error.message)
+    } finally {
+      this.setBundleButtonState(false, 'Bundle with Rolldown')
+    }
+  }
+
+  async handleInstall() {
+    const packageName = prompt('Enter package name to install (leave blank to cancel):')
+
+    if (!packageName?.trim()) {
+      return
+    }
+
+    try {
+      this.setInstallButtonState(true, 'Installing...')
+      this.setOutput('<p>Installing package...</p>')
+
+      await this.memfs.installPackage(packageName.trim())
+      this.displayInstallSuccess(packageName.trim())
+
+    } catch (error) {
+      console.error('Installation error:', error)
+      this.displayError('Installation Error:', error.message)
+    } finally {
+      this.setInstallButtonState(false, 'Install Package')
+    }
+  }
+
+  setBundleButtonState(disabled, text) {
+    this.bundleButton.disabled = disabled
+    this.bundleButton.textContent = text
+  }
+
+  setInstallButtonState(disabled, text) {
+    this.installButton.disabled = disabled
+    this.installButton.textContent = text
+  }
+
+  setOutput(html) {
+    this.outputElement.innerHTML = html
+  }
+
+  displayBundleSuccess(code) {
+    this.setOutput(`
       <h3>Bundled Output:</h3>
-      <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;"><code>${bundledCode}</code></pre>
-    `
-  } catch (error) {
-    console.log(`error: `, error)
-    outputElement.innerHTML = `
-      <h3>Error:</h3>
-      <pre style="background: #ffe6e6; padding: 10px; border-radius: 4px; color: #d00;"><code>${error.message}</code></pre>
-    `
-  } finally {
-    bundleButton.disabled = false
-    bundleButton.textContent = 'Bundle with Rolldown'
-  }
-})
-
-installButton.addEventListener('click', async () => {
-  const packageName = prompt('Enter package name to install (leave blank to cancel):')
-  
-  if (!packageName || packageName.trim() === '') {
-    return
+      <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;"><code>${code}</code></pre>
+    `)
   }
 
-  try {
-    installButton.disabled = true
-    installButton.textContent = 'Installing...'
-    outputElement.innerHTML = '<p>Installing package...</p>'
-    
-    await memfs.installPackage(packageName.trim())
-    
-    outputElement.innerHTML = `
+  displayInstallSuccess(packageName) {
+    this.setOutput(`
       <h3>Package Installed Successfully:</h3>
-      <p style="background: #e6ffe6; padding: 10px; border-radius: 4px; color: #008000;">Package "${packageName.trim()}" has been installed and is now available in your code.</p>
-    `
-  } catch (error) {
-    console.log(`Installation error: `, error)
-    outputElement.innerHTML = `
-      <h3>Installation Error:</h3>
-      <pre style="background: #ffe6e6; padding: 10px; border-radius: 4px; color: #d00;"><code>${error.message}</code></pre>
-    `
-  } finally {
-    installButton.disabled = false
-    installButton.textContent = 'Install Package'
+      <p style="background: #e6ffe6; padding: 10px; border-radius: 4px; color: #008000;">Package "${packageName}" has been installed and is now available in your code.</p>
+    `)
   }
-})
+
+  displayError(title, message) {
+    this.setOutput(`
+      <h3>${title}</h3>
+      <pre style="background: #ffe6e6; padding: 10px; border-radius: 4px; color: #d00;"><code>${message}</code></pre>
+    `)
+  }
+}
+
+new RolldownDemo()

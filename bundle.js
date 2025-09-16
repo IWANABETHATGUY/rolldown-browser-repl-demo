@@ -1,7 +1,8 @@
 import { resolve } from 'pathe'
+
 export class Bundler {
   constructor(memoryfs) {
-    /**@type {import('./memfs.js').MemfsWithPackageInstaller} */
+    /** @type {import('./memfs.js').MemfsWithPackageInstaller} */
     this.memoryfs = memoryfs
   }
 
@@ -23,7 +24,6 @@ export class Bundler {
               console.log(`p: `, p)
               return p;
             } else {
-              debugger
               // assume it is from 'node_modules'
               // 1. load the package.json to find the "module" field of related package
               let packageDir = resolve('/', 'node_modules', source)
@@ -50,7 +50,6 @@ export class Bundler {
     const { output } = await build.generate({
       format: 'es'
     })
-    console.log(`output: `, output)
 
     return output
   }

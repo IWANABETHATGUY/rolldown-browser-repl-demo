@@ -7,19 +7,35 @@
     <title>Rolldown Browser Demo</title>
   </head>
   <body>
-    <div id="app">
-      <div>
+    <main id="app">
+      <header>
         <h1>Rolldown Browser Demo</h1>
-        <div class="card">
-          <textarea id="input" placeholder="Enter JavaScript code here..." style="width: 100%; height: 200px; margin-bottom: 10px;"></textarea>
-          <div style="margin-bottom: 10px;">
-            <button id="bundle" type="button">Bundle with Rolldown</button>
-            <button id="install" type="button">Install Package</button>
-          </div>
-          <div id="output" style="margin-top: 20px;"></div>
+      </header>
+
+      <section class="card">
+        <div class="input-section">
+          <label for="input" class="visually-hidden">JavaScript code input</label>
+          <textarea
+            id="input"
+            placeholder="Enter JavaScript code here..."
+            aria-label="JavaScript code editor"
+            class="code-input"
+          ></textarea>
         </div>
-      </div>
-    </div>
+
+        <div class="controls">
+          <button id="bundle" type="button" class="primary-button">
+            Bundle with Rolldown
+          </button>
+          <button id="install" type="button" class="secondary-button">
+            Install Package
+          </button>
+        </div>
+
+        <section id="output" class="output-section" aria-live="polite"></section>
+      </section>
+    </main>
+
     <script type="module" src="/main.js"></script>
   </body>
 </html>
